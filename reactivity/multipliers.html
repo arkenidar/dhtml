@@ -9,13 +9,62 @@
 
 <body>
     <h1>Multipliers</h1>
+    <p>Common multiplier is shared between all specific multipliers</p>
+    <p>Specific multipliers are unique to each other</p>
+    <p>When common multiplier changes, all specific multipliers are updated</p>
+    <p>When specific multiplier changes, only that specific multiplier is updated</p>
+    <p>When a multiplier is incremented, it is updated</p>
+    <hr>
+    <h2>First instance #1</h2>
+    <hr>
     <h2>Common Multiplier</h2>
     <input type="number" class="common_multiplier" value="2" oninput="update_all_multipliers()">
+
     <h2>Specific Multipliers</h2>
     <input type="number" class="specific_multiplier" value="10" oninput="update_specific_multipliers([this])">
-    <div class="multiplier_output"></div>
+    <div>
+        <span class="multiplier_output"></span>
+        <button onclick="increment_multiplier(this, 'specific_multiplier')">++ specific</button>
+        <button onclick="increment_multiplier(this, 'common_multiplier')">++ common</button>
+    </div>
+
     <input type="number" class="specific_multiplier" value="20" oninput="update_specific_multipliers([this])">
-    <div class="multiplier_output"></div>
+    <div>
+        <span class="multiplier_output"></span>
+        <button onclick="increment_multiplier(this, 'specific_multiplier')">++ specific</button>
+        <button onclick="increment_multiplier(this, 'common_multiplier')">++ common</button>
+    </div>
+
+    <hr>
+    <h2>Second instance #2</h2>
+    <hr>
+    <h2>Common Multiplier</h2>
+    <input type="number" class="common_multiplier" value="2" oninput="update_all_multipliers()">
+
+    <h2>Specific Multipliers</h2>
+    <input type="number" class="specific_multiplier" value="10" oninput="update_specific_multipliers([this])">
+    <div>
+        <span class="multiplier_output"></span>
+        <button onclick="increment_multiplier(this, 'specific_multiplier')">++ specific</button>
+        <button onclick="increment_multiplier(this, 'common_multiplier')">++ common</button>
+    </div>
+
+    <input type="number" class="specific_multiplier" value="20" oninput="update_specific_multipliers([this])">
+    <div>
+        <span class="multiplier_output"></span>
+        <button onclick="increment_multiplier(this, 'specific_multiplier')">++ specific</button>
+        <button onclick="increment_multiplier(this, 'common_multiplier')">++ common</button>
+    </div>
+
+    <input type="number" class="specific_multiplier" value="30" oninput="update_specific_multipliers([this])">
+    <div>
+        <span class="multiplier_output"></span>
+        <button onclick="increment_multiplier(this, 'specific_multiplier')">++ specific</button>
+        <button onclick="increment_multiplier(this, 'common_multiplier')">++ common</button>
+    </div>
+    <hr>
+    <p>Many instances are possible so it's primed for componentization also (componentization not done yet, possible
+        in many, many ways, having this). </p>
     <script>
         update_all_multipliers()
         function update_all_multipliers() {
@@ -24,12 +73,23 @@
         function update_specific_multipliers(specific_multipliers) {
             specific_multipliers.forEach(specific_multiplier => {
                 let value1 = parseInt(specific_multiplier.value)
-                let value2 = parseInt(document.querySelector('.common_multiplier').value)
-                specific_multiplier.nextSibling.nextSibling.textContent = `${value1} * ${value2} => ${value1 * value2}`
+                let common_multiplier = find_input(specific_multiplier, 'common_multiplier')
+                let value2 = parseInt(common_multiplier.value)
+                specific_multiplier.nextSibling.nextSibling.querySelector('.multiplier_output').textContent = `${value1} * ${value2} => ${value1 * value2}`
             })
+        }
+        function find_input(input, className) {
+            for (; !input.classList.contains(className); input = input.previousElementSibling);
+            return input
+        }
+        function increment_multiplier(button, className) {
+            let input = find_input(button.parentNode, className)
+            input.value++
+            input.oninput()
         }
     </script>
     <hr>
+    <h2>Source Code</h2>
     <script src="../show-source.js"></script>
 </body>
 
