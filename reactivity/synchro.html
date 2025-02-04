@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>synchronized</title>
+</head>
+
+<body>
+    <h3>synchronized input tags</h3>
+    <p>... an exercise on reactivity.</p>
+    <p> reactivity which should be a matter of plain js language ! in my thoughtful opinion , at least .</p>
+
+    <input type="text" id="input1">
+    <input type="text" id="input2">
+    <input type="text" id="input3">
+
+    <script>
+        var inputs = [input1, input2, input3]
+        for (var input of inputs) {
+            input.oninput = function () {
+                var value = this.value
+                for (var input of inputs) {
+                    input.value = value
+                }
+            }
+        }
+    </script>
+
+    <hr>
+    <script src="../show-source.js"></script>
+</body>
+
+</html>
