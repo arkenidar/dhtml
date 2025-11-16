@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reactivity Examples - Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 2rem;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 0.3rem;
+        }
+
+        h3 {
+            color: #2980b9;
+            margin-top: 1.5rem;
+        }
+
+        h4 {
+            color: #7f8c8d;
+            margin-top: 1rem;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        .section {
+            margin: 2rem 0;
+        }
+
+        ul,
+        ol {
+            margin: 0.5rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.3rem 0;
+        }
+
+        strong {
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        td {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 2rem 0;
+        }
+
+        .back-link {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html" class="back-link">← Back to Examples</a>
+
+    <h1>Reactivity Examples - Documentation</h1>
+
+    <p>This directory contains three examples demonstrating different reactive programming patterns using vanilla
+        JavaScript.</p>
+
+    <div class="section">
+        <h2>Overview</h2>
+        <p>These examples teach core reactive programming concepts without framework dependencies, showing the manual
+            patterns that modern frameworks automate.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+        <h2>1. Check Boxes (<code>check-boxes.html</code>, <code>check-boxes.js</code>)</h2>
+
+        <h3>Concept: Derived State / Computed Properties</h3>
+        <p><strong>Pattern</strong>: UI automatically reacts to state changes - the background color is derived from
+            checkbox states.</p>
+
+        <h3>How it works:</h3>
+        <pre><code>bind_checkboxes(result1)
+bind_checkboxes(result2)
+
+function bind_checkboxes(cb_group) {
+    var cb_list = []
+    cb_group.querySelectorAll('input[type=checkbox]').forEach(
+        cb => {
+            cb_list.push(cb);
+            cb.oninput = cb_handler;
+        }
+    )
+
+    function cb_handler() {
+        var ok = cb_list.every(cb => cb.checked)
+        cb_group.style.backgroundColor = ok ? 'lightgreen' : ""
+    }
+
+    cb_handler()
+}</code></pre>
+
+        <h3>Key Concepts:</h3>
+        <ol>
+            <li><strong>Declarative state observation</strong>: Instead of manually updating the background in multiple
+                places, you define one rule: "background is green when all boxes are checked"</li>
+            <li><strong>Separation of concerns</strong>:
+                <ul>
+                    <li>The <code>cb_handler</code> function contains the logic (what should happen)</li>
+                    <li>The event binding ensures it runs at the right times (when it should happen)</li>
+                </ul>
+            </li>
+            <li><strong>Single source of truth</strong>: The checkbox states are the data, and the background color is
+                derived from that data automatically</li>
+            <li><strong>Idempotent rendering</strong>: <code>cb_handler()</code> can be called repeatedly and always
+                produces the correct result based on current state</li>
+        </ol>
+
+        <h3>Behavior:</h3>
+        <ul>
+            <li><strong>result1</strong>: 3 checkboxes (all checked initially) → <code>lightgreen</code> background when
+                all checked</li>
+            <li><strong>result2</strong>: 4 checkboxes (all unchecked initially) → <code>lightgreen</code> background
+                only when all checked</li>
+            <li>As users check/uncheck boxes, the background reactively updates in real-time</li>
+        </ul>
+
+        <h3>Real-world analogy:</h3>
+        <p>Like a light switch that turns on only when ALL conditions are met.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+        <h2>2. Multipliers (<code>multipliers.html</code>, <code>multipliers.js</code>)</h2>
+
+        <h3>Concept: Shared State with Multiple Dependents</h3>
+        <p><strong>Pattern</strong>: One value affects multiple outputs - demonstrates one-to-many reactivity and
+            dependency graphs.</p>
+
+        <h3>How it works:</h3>
+        <pre><code>update_all_multipliers()
+
+function update_all_multipliers() {
+    update_specific_multipliers(document.querySelectorAll('.specific_multiplier'))
+}
+
+function update_specific_multipliers(specific_multipliers) {
+    specific_multipliers.forEach(specific_multiplier => {
+        let value1 = parseInt(specific_multiplier.value)
+        let common_multiplier = find_input(specific_multiplier, 'common_multiplier')
+        let value2 = parseInt(common_multiplier.value)
+        specific_multiplier.nextSibling.nextSibling.querySelector('.multiplier_output').textContent = 
+            `${value1} * ${value2} => ${value1 * value2}`
+    })
+}
+
+function find_input(input, className) {
+    for (; !input.classList.contains(className); input = input.previousElementSibling);
+    return input
+}
+
+function increment_multiplier(button, className) {
+    let input = find_input(button.parentNode, className)
+    input.value++
+    input.oninput()
+}</code></pre>
+
+        <h3>Key Concepts:</h3>
+        <ol>
+            <li><strong>One-to-many reactivity</strong>: One <code>common_multiplier</code> affects multiple
+                <code>specific_multiplier</code> outputs. When the common value changes, all dependent calculations
+                update.</li>
+            <li><strong>Dependency graph</strong>: Each output depends on TWO inputs:
+                <ul>
+                    <li>Its own specific multiplier</li>
+                    <li>The shared common multiplier</li>
+                </ul>
+            </li>
+            <li><strong>Cascading updates</strong>: The <code>increment_multiplier</code> function shows the pattern:
+                <ul>
+                    <li>Change data (<code>input.value++</code>)</li>
+                    <li>Trigger reactive update (<code>input.oninput()</code>)</li>
+                    <li>Let the system propagate changes</li>
+                </ul>
+            </li>
+            <li><strong>Reusable update logic</strong>: <code>update_specific_multipliers()</code> can be called with
+                any subset of multipliers, making it flexible for partial updates or full recalculations.</li>
+        </ol>
+
+        <h3>Real-world analogy:</h3>
+        <p>Like a spreadsheet - change one cell, and all formulas referencing it recalculate automatically.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+        <h2>3. Synchro (<code>synchro.html</code>, <code>synchro.js</code>)</h2>
+
+        <h3>Concept: Bidirectional Synchronization / Peer-to-Peer Reactivity</h3>
+        <p><strong>Pattern</strong>: Multiple inputs stay in sync - any one can be the source, all others follow.</p>
+
+        <h3>How it works:</h3>
+        <pre><code>var inputs1 = [input1, input2, input3]
+var inputs2 = [input4, input5, input6]
+sync(inputs1)
+sync(inputs2)
+
+function sync(inputs) {
+    for (var input of inputs) {
+        input.oninput = function () {
+            var value = this.value
+            for (var input of inputs) {
+                input.value = value
+            }
+        }
+    }
+}</code></pre>
+
+        <h3>Key Concepts:</h3>
+        <ol>
+            <li><strong>Two-way binding within groups</strong>: Any input in a group changes → all others in that group
+                update to match</li>
+            <li><strong>Multiple synchronized groups</strong>: <code>inputs1</code> and <code>inputs2</code> are
+                independent - changes in one group don't affect the other</li>
+            <li><strong>No single source of truth</strong>: Unlike the previous examples where state flowed one
+                direction (checkboxes → background, multipliers → output), here any input can be the source</li>
+            <li><strong>Symmetrical relationships</strong>: Each input is both a trigger and a target of updates</li>
+        </ol>
+
+        <h3>Real-world applications:</h3>
+        <ul>
+            <li><strong>Collaborative editing</strong>: Like Google Docs where multiple cursors see the same content
+            </li>
+            <li><strong>Mirrored state</strong>: Keeping multiple UI representations of the same data in sync</li>
+            <li><strong>Form fields that mirror each other</strong>: e.g., billing = shipping address</li>
+            <li><strong>Multiple views</strong>: list view ↔ grid view ↔ detail view</li>
+            <li><strong>Synchronized controls</strong>: sliders paired with number inputs</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+        <h2>Comparison with Modern Frameworks</h2>
+
+        <h3>What These Examples Show</h3>
+        <p>These examples demonstrate the <strong>manual plumbing</strong> that modern frameworks automate. You
+            explicitly:</p>
+        <ul>
+            <li>Bind event listeners</li>
+            <li>Define when updates should happen</li>
+            <li>Call update functions</li>
+        </ul>
+
+        <h3>Framework Magic (Compiler/Runtime)</h3>
+        <p>Modern frameworks use language or compiler magic to eliminate boilerplate:</p>
+
+        <h4>Svelte (Compile-time reactivity):</h4>
+        <pre><code>&lt;script&gt;
+  $: allChecked = checkboxes.every(cb => cb.checked)
+  $: background = allChecked ? 'lightgreen' : ''
+&lt;/script&gt;</code></pre>
+        <p>The <code>$:</code> tells the compiler "this is reactive, regenerate when dependencies change"</p>
+
+        <h4>Vue 3 (Proxy-based runtime reactivity):</h4>
+        <pre><code>const state = reactive({
+  checkboxes: [...],
+  background: computed(() => 
+    state.checkboxes.every(cb => cb.checked) ? 'lightgreen' : ''
+  )
+})</code></pre>
+
+        <h4>What the compiler/runtime generates:</h4>
+        <ul>
+            <li>Automatic dependency tracking: "background depends on allChecked, which depends on checkboxes"</li>
+            <li>Auto-generated event listeners</li>
+            <li>Efficient change detection (only re-compute what changed)</li>
+            <li>Update batching to avoid redundant renders</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+        <h2>Summary: Three Patterns of Reactivity</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Example</th>
+                    <th>Pattern</th>
+                    <th>Direction</th>
+                    <th>Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Check Boxes</strong></td>
+                    <td>Derived state</td>
+                    <td>One direction (data → UI)</td>
+                    <td>Computing values from state</td>
+                </tr>
+                <tr>
+                    <td><strong>Multipliers</strong></td>
+                    <td>Computed dependencies</td>
+                    <td>One-to-many</td>
+                    <td>Shared state affecting multiple outputs</td>
+                </tr>
+                <tr>
+                    <td><strong>Synchro</strong></td>
+                    <td>Synchronized state</td>
+                    <td>Bidirectional (peer-to-peer)</td>
+                    <td>Keeping multiple inputs in sync</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Together, these examples form a complete introduction to reactive programming fundamentals.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+        <h2>Educational Value</h2>
+
+        <p>This is a teaching collection showing <strong>reactivity without framework magic</strong> - the core concepts
+            that underpin:</p>
+        <ul>
+            <li>React's state management</li>
+            <li>Vue's reactivity system</li>
+            <li>Svelte's compile-time reactivity</li>
+            <li>Angular's change detection</li>
+            <li>Observable patterns (RxJS)</li>
+        </ul>
+
+        <p>Understanding these manual patterns makes it easier to understand what frameworks are doing under the hood.
+        </p>
+    </div>
+
+    <a href="index.html" class="back-link">← Back to Examples</a>
+</body>
+
+</html>
